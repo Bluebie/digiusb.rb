@@ -1,0 +1,28 @@
+#!/usr/bin/env ruby
+$:.unshift File.dirname(__FILE__) + "/../lib"
+require 'digiusb'
+require 'io/console'
+
+puts "Looking for Digispark running DigiUSB..."
+
+sleep 0.25 until DigiUSB.sparks.length > 0
+spark = DigiUSB.sparks.last
+
+puts "Attached to #{spark}"
+puts "Type control + c to exit"
+
+begin
+  loop do
+    print spark.getc
+    
+    begin
+      char = IO.console.read_nonblock(1)
+      spark.putc char
+    rescue Errno::EAGAIN
+    end
+  end
+rescue LIBUSB::ERROR_PIPE
+  puts "Digispark disconnected or crashed"
+rescue Interrupt
+  puts ""
+end
