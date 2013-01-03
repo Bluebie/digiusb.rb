@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name = 'digiusb'
-  s.version = '0.0.2'
+  s.version = '0.0.4'
   s.summary = "a tiny library for talking to digisparks"
   s.author = 'Bluebie'
   s.email = "a@creativepony.com"
@@ -10,6 +10,7 @@ Gem::Specification.new do |s|
   version of the Arduino software. Also includes a tiny terminal tool, kinda like telnet for digisparks"
   s.files = Dir['lib/**.rb'] + ['readme.txt', 'license.txt'] + Dir['examples/**.rb'] + Dir['bin/**.rb']
   s.executables << 'digiterm'
+  s.required_ruby_version = '>= 1.9.3' # thanks dmcinnes
   
   s.rdoc_options << '--main' << 'lib/digiusb.rb'
   
