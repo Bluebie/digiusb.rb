@@ -32,7 +32,7 @@ class DigiUSB
   
   # write a single character
   def putc character
-    character = [character].pack('c') if character.is_a? Integer
+    character = [character % 256].pack('c') if character.is_a? Integer
     raise "Cannot putc more than one byte" if character.bytesize > 1
     raise "Cannot putc fewer than one byte" if character.bytesize < 1
     
