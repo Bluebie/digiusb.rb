@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name = 'digiusb'
-  s.version = '0.0.4'
+  s.version = '0.0.5'
   s.summary = "a tiny library for talking to digisparks"
   s.author = 'Bluebie'
   s.email = "a@creativepony.com"
