@@ -72,7 +72,7 @@ class DigiUSB
   end
   
   def inspect
-    "<Digispark:#{@device.product}:@#{@device.bus_number}->#{@device.device_address}>"
+    "<Digispark:#{@device.product}:@#{@device.bus_number}.#{@device.device_address}>"
   end
   alias_method :to_s, :inspect
   
