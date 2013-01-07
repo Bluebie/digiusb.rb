@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name = 'digiusb'
-  s.version = '0.0.5'
+  s.version = '0.0.6'
   s.summary = "a tiny library for talking to digisparks"
   s.author = 'Bluebie'
   s.email = "a@creativepony.com"
@@ -15,4 +15,6 @@ Gem::Specification.new do |s|
   s.rdoc_options << '--main' << 'lib/digiusb.rb'
   
   s.add_dependency 'libusb', '>= 0.2.0'
+  s.add_dependency 'colorist', '>= 0.0.2' # used by digiusb/digiblink for parsing colors
+  s.add_dependency 'colored', '>= 1.2' # used by digiterm to color output
 end

@@ -1,19 +1,20 @@
 #!/usr/bin/env ruby
 $:.unshift File.dirname(__FILE__) + "/../lib"
 require 'digiusb'
+require 'colored'
 require 'io/console'
 
-puts "Looking for Digispark running DigiUSB..."
+puts "Looking for Digispark running DigiUSB...".blue
 
 sleep 0.25 until DigiUSB.sparks.length > 0
 spark = DigiUSB.sparks.last
 
-puts "Attached to #{spark}"
-puts "Type control + c to exit"
+puts "Attached to #{spark.inspect.green}".blue
+puts "Type control + c to exit".blue
 
 begin
   loop do
-    print spark.getc
+    print spark.getc.green
     
     begin
       char = IO.console.read_nonblock(1)
@@ -22,7 +23,7 @@ begin
     end
   end
 rescue LIBUSB::ERROR_PIPE
-  puts "Digispark disconnected or crashed"
+  puts "Digispark disconnected or crashed".white_on_red
 rescue Interrupt
   puts ""
 end
