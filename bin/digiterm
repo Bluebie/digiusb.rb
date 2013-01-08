@@ -14,7 +14,12 @@ puts "Type control + c to exit".blue
 
 begin
   loop do
-    print spark.getc.green
+    char = spark.getc
+    if char != ""
+      print char.green 
+    else
+      sleep 1.0 / 30.0
+    end
     
     begin
       char = IO.console.read_nonblock(1)
