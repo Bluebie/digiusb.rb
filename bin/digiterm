@@ -28,6 +28,7 @@ begin
     end
   end
 rescue LIBUSB::ERROR_PIPE, LIBUSB::ERROR_NO_DEVICE
+  puts "" # newline
   puts "Digispark disconnected or crashed".white_on_red
 rescue Interrupt
   puts ""
