@@ -11,7 +11,6 @@ spark = DigiUSB.sparks.last
 
 puts "Attached to #{spark.inspect.green}".blue
 puts "Type control + c to exit".blue
-
 begin
   loop do
     char = spark.getc
@@ -29,7 +28,11 @@ begin
   end
 rescue LIBUSB::ERROR_PIPE, LIBUSB::ERROR_NO_DEVICE
   puts "" # newline
-  puts "Digispark disconnected or crashed".white_on_red
+  puts "Digispark disconnected".white_on_red
+rescue DigiUSB::ErrorCrashed
+  puts "" # newline
+  puts "Digispark has crashed".white_on_red
+  puts " >> Probably need to call DigiUSB.refresh() more frequently in Digispark Program".blue
 rescue Interrupt
   puts ""
 end
