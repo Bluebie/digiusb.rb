@@ -6,7 +6,7 @@ require 'io/console'
 
 puts "Looking for Digispark running DigiUSB...".blue
 
-sleep 0.25 until DigiUSB.sparks.length > 0
+sleep 0.5 until DigiUSB.sparks.length > 0
 spark = DigiUSB.sparks.last
 
 puts "Attached to #{spark.inspect.green}".blue
