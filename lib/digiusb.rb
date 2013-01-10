@@ -18,7 +18,6 @@ require 'libusb'
 class DigiUSB
   ProductID = 0x05df # product id number from Digistump
   VendorID = 0x16c0 # vendor id number for Digistump
-  Manufacturer = "digistump.com" # manufacturer string is static
   Timeout = 1_000 # one second till device crashes due to lack of calling DigiUSB.refresh()
   DefaultPollingFrequency = 15 # 15hz when waiting for data to be printed
   
@@ -39,7 +38,7 @@ class DigiUSB
   def self.sparks product_name = false
     usb = LIBUSB::Context.new
     usb.devices.select { |device|
-      device.idProduct == ProductID && device.idVendor == VendorID && device.manufacturer == "digistump.com" && (product_name == false || product_name.to_s == device.product)
+      device.idProduct == ProductID && device.idVendor == VendorID && (product_name == false || product_name.to_s == device.product)
     }.map { |handle|
       self.new(handle)
     }
