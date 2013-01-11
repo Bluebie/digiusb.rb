@@ -4,18 +4,50 @@ require 'digiusb'
 require 'colored'
 require 'io/console'
 
-puts "Looking for Digispark running DigiUSB...".blue
+if ARGV.include? '--help' or ARGV.include? '-h'
+  puts "Usage:"
+  puts "  digiterm [options]"
+  puts "  digiterm [options] [device name]"
+  puts
+  puts "  Options:"
+  puts "   --raw      Disable ansi colouring and other friendly decorations."
+  puts "              Useful for using as subprocess from another programming language."
+  puts "   --no-wait  Don't loop and wait for a digispark - return immediately if no"
+  puts "              device is found."
+  puts "   --no-info  Don't write out any status information to standard error output"
+  exit
+end
 
-sleep 0.5 until DigiUSB.sparks.length > 0
-spark = DigiUSB.sparks.last
+raw_mode = ARGV.include?("--raw")
+device_name = if ARGV.empty? or ARGV.last.start_with?("--")
+                false
+              else
+                ARGV.last
+              end
+no_stderr = ARGV.include?("--no-info")
 
-puts "Attached to #{spark.inspect.green}".blue
-puts "Type control + c to exit".blue
+
+$stderr.puts "Looking for Digispark running DigiUSB...".blue unless no_stderr
+
+sleep 0.5 until DigiUSB.sparks(device_name).length > 0 unless ARGV.include? '--no-wait'
+spark = DigiUSB.sparks(device_name).last
+
+unless spark
+  $stderr.puts "No device found".white_on_red unless no_stderr
+  exit 1
+end
+
+$stderr.puts "Attached to #{spark.inspect.green}".blue unless no_stderr
+$stderr.puts "Type control + c to exit".blue unless no_stderr
 begin
   loop do
     char = spark.getc
     if char != ""
-      print char.green 
+      if raw_mode
+        print char
+      else
+        print char.green
+      end
     else
       sleep 1.0 / 30.0
     end
@@ -27,12 +59,18 @@ begin
     end
   end
 rescue LIBUSB::ERROR_PIPE, LIBUSB::ERROR_NO_DEVICE
-  puts "" # newline
-  puts "Digispark disconnected".white_on_red
+  unless no_stderr
+    $stderr.puts "" # newline
+    $stderr.puts "Digispark disconnected".white_on_red unless no_stderr
+  end
+  exit 2
 rescue DigiUSB::ErrorCrashed
-  puts "" # newline
-  puts "Digispark has crashed".white_on_red
-  puts " >> Probably need to call DigiUSB.refresh() more frequently in Digispark Program".blue
+  unless no_stderr
+    $stderr.puts "" # newline
+    $stderr.puts "Digispark has crashed".white_on_red
+    $stderr.puts " >> Probably need to call DigiUSB.refresh() more frequently in Digispark Program".blue
+  end
+  exit 3
 rescue Interrupt
-  puts ""
+  $stderr.puts "" unless no_stderr
 end
