@@ -3,8 +3,8 @@ require 'digiusb'
 require 'colorist'
 
 class DigiBlink < DigiUSB
-  def color= value
-    color = value.to_color unless value.is_a? Colorist::Color
+  def color=(color)
+    color = color.to_color unless color.is_a? Colorist::Color
 
     # send out each byte
     self.putc 's' # start character
