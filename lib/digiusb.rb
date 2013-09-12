@@ -58,7 +58,7 @@ class DigiUSB
   # Send a single character in to the Digispark's memory. Argument may be either a single byte String, or an integer between 0 and 255 inclusive.
   # Returns next time Digispark calls DigiUSB.refresh()
   def putc character
-    character = [character % 256].pack('c') if character.is_a? Integer
+    character = [character % 256].pack('C') if character.is_a? Integer
     raise "Cannot putc more than one byte" if character.bytesize > 1
     raise "Cannot putc fewer than one byte" if character.bytesize < 1
     
