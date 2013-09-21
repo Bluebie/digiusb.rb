@@ -75,7 +75,7 @@ class DigiUSB
     until chars.include? "\n"
       char = getc()
       chars += char
-      sleep 1.0 / PollingFrequency if char == ""
+      sleep 1.0 / @polling_frequency if char == ""
     end
     return chars
   end
@@ -108,7 +108,7 @@ class DigiUSB
     until chars.include? "\n"
       char = getc()
       chars += char
-      sleep 1.0 / PollingFrequency if char == ""
+      sleep 1.0 / @polling_frequency if char == ""
     end
     
     chars += getc() until chars.length == bytes
