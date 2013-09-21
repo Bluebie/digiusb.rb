@@ -1,16 +1,25 @@
-# The DigiUSB class helps find, connect to, and talk with Digisparks using the DigiUSB arduino library bundled with the Digispark Arduino software.
-# This class aims to work like an IO object, letting you read and write characters, bytes, and strings as if it were a file, socket, or serial port.
-# To get started, grab a list of Digisparks with the DigiUSB.sparks method. Each spark has an inspect method with a unique identifier including the
-# USB device name (usually DigiUSB), and some numbers representing which ports and hubs each spark connects to. To begin with, DigiUSB.sparks.last
-# works well if you only intend to have one digispark connected to your computer. Eventually the device name (aka "product name") will hopefully
-# provide a simple way to differentiate different digisparks.
+# The DigiUSB class helps find, connect to, and talk with Digisparks using the
+# DigiUSB arduino library bundled with the Digispark Arduino software. This
+# class aims to work like an IO object, letting you read and write characters,
+# bytes, and strings as if it were a file, socket, or serial port. To get
+# started, grab a list of Digisparks with the DigiUSB.sparks method. Each spark
+# has an inspect method with a unique identifier including the USB device name
+# (usually DigiUSB), and some numbers representing which ports and hubs each
+# spark connects to. To begin with, DigiUSB.sparks.last works well if you only
+# intend to have one digispark connected to your computer. Eventually the device
+# name (aka "product name") will hopefully provide a simple way to differentiate
+# different digisparks.
 #
-# Once you have a reference to a Digispark, you can start using it as if it were an IO object immediately with methods like getc and putc.
-# As soon as you start interacting with the Digispark using these reading and writing methods the Digispark will be claimed to your ruby program
-# and will be unavailable to other programs until you do one of: close the ruby program, or unplug and plug back in the Digispark.
+# Once you have a reference to a Digispark, you can start using it as if it were
+# an IO object immediately with methods like getc and putc. As soon as you start
+# interacting with the Digispark using these reading and writing methods the
+# Digispark will be claimed to your ruby program and will be unavailable to
+# other programs until you do one of: close the ruby program, or unplug and plug
+# back in the Digispark.
 #
-# Note also that calling DigiUSB.sparks can sometimes disrupt program uploads, so if you're polling waiting for a digispark to appear you may see
-# some programming errors in the Digispark Arduino software.
+# Note also that calling DigiUSB.sparks can sometimes disrupt program uploads,
+# so if you're polling waiting for a digispark to appear you may see some
+# programming errors in the Digispark Arduino software.
 
 require 'libusb'
 
@@ -18,7 +27,7 @@ require 'libusb'
 class DigiUSB
   ProductID = 0x05df # product id number from Digistump
   VendorID = 0x16c0 # vendor id number for Digistump
-  Timeout = 1_000 # one second till device crashes due to lack of calling DigiUSB.refresh()
+  Timeout = 1_000 # spark needs to DigiUSB.refresh or DigiUSB.sleep every second
   DefaultPollingFrequency = 15 # 15hz when waiting for data to be printed
   
   # :nodoc: initialize a new DigiUSB object using a libusb device object
@@ -28,13 +37,15 @@ class DigiUSB
     @polling_frequency = DefaultPollingFrequency
   end
   
-  # polling frequency describes how aggressively ruby will ask for new bytes when waiting for the device to print something
-  # a lower value is faster (it is in hertz)
+  # polling frequency describes how aggressively ruby will ask for new bytes
+  # when waiting for the device to print something a lower value is faster (it
+  # is in hertz)
   attr_accessor :polling_frequency
   
-  # Returns an array of all Digisparks connected to this computer. Optionally specify a device name string to return only Digisparks with
-  # that name. At the time of writing there is no easy way to customize the device name in the Digispark Arduino software, but hopefully
-  # there will be in the future.
+  # Returns an array of all Digisparks connected to this computer. Optionally
+  # specify a device name string to return only Digisparks with that name. At
+  # the time of writing there is no easy way to customize the device name in
+  # the Digispark Arduino software, but hopefully there will be in the future.
   def self.sparks product_name = false
     usb = LIBUSB::Context.new
     usb.devices.select { |device|
@@ -45,9 +56,11 @@ class DigiUSB
   end
   
   
-  # Attempt to read a single character from the Digispark. Returns a string either zero or one characters long.
-  # A zero character string means there are no characters available to read - the Digispark hasn't printed anything for you to consume yet.
-  # Returns next time Digispark calls DigiUSB.refresh() regardless of how many characters are available.
+  # Attempt to read a single character from the Digispark. Returns a string
+  # either zero or one characters long. A zero character string means there are
+  # no characters available to read - the Digispark hasn't printed anything for
+  # you to consume yet. Returns next time Digispark calls DigiUSB.refresh()
+  # regardless of how many characters are available.
   def getc
     control_transfer(
       bRequest: 0x01, # hid get report
@@ -55,7 +68,9 @@ class DigiUSB
     )
   end
   
-  # Send a single character in to the Digispark's memory. Argument may be either a single byte String, or an integer between 0 and 255 inclusive.
+  # Send a single character in to the Digispark's memory. Argument may be either
+  # a single byte String, or an integer between 0 and 255 inclusive.
+  #
   # Returns next time Digispark calls DigiUSB.refresh()
   def putc character
     character = [character % 256].pack('C') if character.is_a? Integer
@@ -68,8 +83,9 @@ class DigiUSB
     )
   end
   
-  # Read a string fromt he Digispark until a newline is received (eg, from the println function in Digispark's DigiUSB library)
-  # The returned string includes a newline character on the end.
+  # Read a string from the Digispark until a newline is received (eg, from the
+  # println function in Digispark's DigiUSB library) The returned string
+  # includes a newline character on the end.
   def gets
     chars = ""
     until chars.include? "\n"
@@ -100,8 +116,9 @@ class DigiUSB
   alias_method :print, :write
   alias_method :send, :write
   
-  # Recieve a specific number of bytes and return them as a String. Unlike #getc read will wait until
-  # the specified number of bytes are available before returning.
+  # Recieve a specific number of bytes and return them as a String. Unlike #getc
+  # read will wait until the specified number of bytes are available before
+  # returning.
   def read bytes = 1
     chars = ""
     
@@ -115,7 +132,8 @@ class DigiUSB
     return chars
   end
   
-  # A friendly textual representation of this specific Digispark. Can be called without claiming the digispark for this program
+  # A friendly textual representation of this specific Digispark. Can be called
+  # without claiming the digispark for this program
   def inspect
     "<Digispark:#{name}:@#{address}>"
   end
@@ -126,7 +144,8 @@ class DigiUSB
     @device.product
   end
   
-  # Returns the device's bus number and address on the computer's USB interface as a string
+  # Returns the device's bus number and address on the computer's USB interface
+  # as a string
   def address
     "#{@device.bus_number}.#{@device.device_address}"
   end
