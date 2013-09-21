@@ -55,6 +55,10 @@ class DigiUSB
     }
   end
   
+  # Connect to a Digispark. Usually the most recently plugged in one.
+  def self.connect product_name = false
+    sparks(product_name).last
+  end
   
   # Attempt to read a single character from the Digispark. Returns a string
   # either zero or one characters long. A zero character string means there are
@@ -118,17 +122,11 @@ class DigiUSB
   
   # Recieve a specific number of bytes and return them as a String. Unlike #getc
   # read will wait until the specified number of bytes are available before
-  # returning.
-  def read bytes = 1
+  # returning. Optionally specify a timeout
+  def read bytes = 1, timeout = nil
+    start_time = Time.now.to_f
     chars = ""
-    
-    until chars.include? "\n"
-      char = getc()
-      chars += char
-      sleep 1.0 / @polling_frequency if char == ""
-    end
-    
-    chars += getc() until chars.length == bytes
+    chars += getc() until chars.length >= bytes || (timeout && Time.now.to_f - start_time > timeout)
     return chars
   end
   
